@@ -1,0 +1,172 @@
+#include <stdio.h>
+#include <stdint.h>
+
+int main(int argc, char *argv[])
+{
+    if (argc != 4)
+        return 1;
+
+    FILE *in = fopen(argv[1], "rb");
+    FILE *out = fopen(argv[2], "wb");
+
+    float factor = atof(argv[3]);
+
+    uint8_t header[44];
+    fread(header, sizeof(uint8_t), 44, in);
+    fwrite(header, sizeof(uint8_t), 44, out);
+
+    int16_t sample;
+
+    while (fread(&sample, sizeof(int16_t), 1, in))
+    {
+        sample *= factor;
+        fwrite(&sample, sizeof(int16_t), 1, out);
+    }
+
+    fclose(in);
+    fclose(out);
+}
+
+void grayscale(int height, int width, RGBTRIPLE image[height][width])
+{
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int avg = round((image[i][j].rgbtRed +
+                             image[i][j].rgbtGreen +
+                             image[i][j].rgbtBlue) / 3.0);
+
+            image[i][j].rgbtRed = avg;
+            image[i][j].rgbtGreen = avg;
+            image[i][j].rgbtBlue = avg;
+        }
+    }
+}
+void sepia(int height, int width, RGBTRIPLE image[height][width])
+{
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int r = image[i][j].rgbtRed;
+            int g = image[i][j].rgbtGreen;
+            int b = image[i][j].rgbtBlue;
+
+            int sr = round(0.393*r + 0.769*g + 0.189*b);
+            int sg = round(0.349*r + 0.686*g + 0.168*b);
+            int sb = round(0.272*r + 0.534*g + 0.131*b);
+
+            image[i][j].rgbtRed = sr > 255 ? 255 : sr;
+            image[i][j].rgbtGreen = sg > 255 ? 255 : sg;
+            image[i][j].rgbtBlue = sb > 255 ? 255 : sb;
+        }
+    }
+}
+
+
+
+
+void reflect(int height, int width, RGBTRIPLE image[height][width])
+{
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width / 2; j++)
+        {
+            RGBTRIPLE temp = image[i][j];
+            image[i][j] = image[i][width - j - 1];
+            image[i][width - j - 1] = temp;
+        }
+    }
+}
+void blur(int height, int width, RGBTRIPLE image[height][width])
+{
+    RGBTRIPLE copy[height][width];
+
+    for (int i = 0; i < height; i++)
+        for (int j = 0; j < width; j++)
+            copy[i][j] = image[i][j];
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int sumR = 0, sumG = 0, sumB = 0, count = 0;
+
+            for (int di = -1; di <= 1; di++)
+            {
+                for (int dj = -1; dj <= 1; dj++)
+                {
+                    int ni = i + di;
+                    int nj = j + dj;
+
+                    if (ni >= 0 && ni < height && nj >= 0 && nj < width)
+                    {
+                        sumR += copy[ni][nj].rgbtRed;
+                        sumG += copy[ni][nj].rgbtGreen;
+                        sumB += copy[ni][nj].rgbtBlue;
+                        count++;
+                    }
+                }
+            }
+
+            image[i][j].rgbtRed = round(sumR / (float)count);
+            image[i][j].rgbtGreen = round(sumG / (float)count);
+            image[i][j].rgbtBlue = round(sumB / (float)count);
+        }
+    }
+}
+
+
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+int main(int argc, char *argv[])
+{
+    if (argc != 2)
+        return 1;
+
+    FILE *in = fopen(argv[1], "rb");
+    if (!in)
+        return 1;
+
+    uint8_t buffer[512];
+    FILE *out = NULL;
+
+    int count = 0;
+    char filename[8];
+
+    while (fread(buffer, 1, 512, in) == 512)
+    {
+        if (buffer[0] == 0xff && buffer[1] == 0xd8 &&
+            buffer[2] == 0xff && (buffer[3] & 0xf0) == 0xe0)
+        {
+            if (out != NULL)
+                fclose(out);
+
+            sprintf(filename, "%03i.jpg", count++);
+            out = fopen(filename, "wb");
+        }
+
+        if (out != NULL)
+            fwrite(buffer, 1, 512, out);
+    }
+
+    if (out != NULL)
+        fclose(out);
+
+    fclose(in);
+}int *p = &x;
+*p = 10;
+
+
+
+
+
+
+
+

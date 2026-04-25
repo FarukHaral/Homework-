@@ -1,0 +1,117 @@
+bool vote(string name)
+{
+    for (int i = 0; i < candidate_count; i++)
+    {
+        if (strcasecmp(name, candidates[i].name) == 0)
+        {
+            candidates[i].votes++;
+            return true;
+        }
+    }
+    return false;
+}
+void print_winner(void)
+{
+    int max = 0;
+
+    for (int i = 0; i < candidate_count; i++)
+    {
+        if (candidates[i].votes > max)
+            max = candidates[i].votes;
+    }
+
+    for (int i = 0; i < candidate_count; i++)
+    {
+        if (candidates[i].votes == max)
+            printf("%s\n", candidates[i].name);
+    }
+}
+
+1. Alice
+2. Bob
+3. Charlie
+
+
+void tabulate(void)
+{
+    for (int i = 0; i < voter_count; i++)
+    {
+        for (int j = 0; j < candidate_count; j++)
+        {
+            int c = preferences[i][j];
+
+            if (!candidates[c].eliminated)
+            {
+                candidates[c].votes++;
+                break;
+            }
+        }
+    }
+
+
+    int find_min(void)
+{
+    int min = voter_count;
+
+    for (int i = 0; i < candidate_count; i++)
+    {
+        if (!candidates[i].eliminated && candidates[i].votes < min)
+            min = candidates[i].votes;
+    }
+
+    return min;
+}
+
+
+
+void eliminate(int min)
+{
+    for (int i = 0; i < candidate_count; i++)
+    {
+        if (candidates[i].votes == min)
+            candidates[i].eliminated = true;
+    }
+}
+preferences[A][B] = kaç kişi A’yı B’ye tercih etti}
+
+
+
+
+A beats B → pair (A, B)
+
+
+
+
+bool creates_cycle(int start, int end)
+{
+    if (start == end)
+        return true;
+
+    for (int i = 0; i < candidate_count; i++)
+    {
+        if (locked[end][i])
+        {
+            if (creates_cycle(start, i))
+                return true;
+        }
+    }
+    return false;
+}
+
+
+for (int i = 0; i < candidate_count; i++)
+{
+    bool is_source = true;
+
+    for (int j = 0; j < candidate_count; j++)
+    {
+        if (locked[j][i])
+            is_source = false;
+    }
+
+    if (is_source)
+    {
+        printf("%s\n", candidates[i].name);
+        return;
+    }
+}
