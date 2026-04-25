@@ -1,0 +1,28 @@
+#def main():
+    print("--- Welcome to the Temperature Converter ---")
+    
+    try:
+        # Taking input in Celsius
+        celsius = float(input("Enter temperature in Celsius: "))
+        
+        # Calculation: (C * 9/5) + 32
+        fahrenheit = (celsius * 9 / 5) + 32
+        
+        # Output using f-string
+        print(f"{celsius}°C is equal to {fahrenheit}°F.")
+        
+    except ValueError:
+        print("Invalid input! Please enter a numeric value.")
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
